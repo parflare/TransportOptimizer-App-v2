@@ -1,0 +1,55 @@
+
+@media (min-width: 801px) {
+    #logo {
+        float: left;
+        width: 30%;
+        font-size: 1.7em;
+    }
+
+    #menu {
+        float: right;
+        width: 50%;
+        font-size: 1.7em;
+    }
+}
+
+@media (max-width: 800px) {
+    #logo {
+        margin-top: 15px;
+        width: 100%;
+        font-size: 1.5em;
+    }
+
+    #menu {
+        float: left;
+        width: 100%;
+        font-size: 1.5em;
+    }
+}
+@media (min-width: 1001px) {
+    #top {
+        font-size: 3em;
+        height: 300px;
+    }
+}
+
+@media (max-width: 1000px) and (min-width: 651px) {
+    #top {
+        font-size: 2em;
+        height: 200px;
+    }
+}
+
+@media (max-width: 650px) {
+    #top {
+        font-size: 1.3em;
+        padding-top: 20%;
+        height: 150px;
+    }
+}
+
+@media (max-width: 450px) {
+    #top {
+        font-size: 0.9em;
+    }
+}

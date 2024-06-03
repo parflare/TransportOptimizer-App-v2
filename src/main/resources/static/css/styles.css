@@ -1,0 +1,206 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto|Suez+One');
+/*@import 'https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300';*/
+/*@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');*/
+
+html {
+    color: #222;
+    font-size: 1em;
+    line-height: 1.4;
+}
+
+::-moz-selection {
+    background: #b3d4fc;
+    text-shadow: none;
+}
+
+::selection {
+    background: rgba(87, 87, 87, 0.3);
+    text-shadow: none;
+}
+
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 1em 0;
+    padding: 0;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    outline: none;
+}
+
+body, html {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    font-family: Trebuchet MS, Helvetica, serif;
+    /*display: flex;*/
+}
+
+video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    min-width: 100%;
+    min-height: 100%;
+    z-index: -1;
+}
+
+header {
+    width: 100%;
+    padding: 0.5% 0 0.5% 0;
+    background: transparent;
+    float: left;
+    position: fixed;
+    transition: background-color 0.5s ease;
+    user-select: none;
+}
+
+header #logo {
+    color: #fff;
+    cursor: pointer;
+    text-align: center;
+    margin: 5px 0;
+}
+
+header #logo span {
+    font-size: 1.7em;
+    line-height: 40px;
+    font-family: 'Suez One', serif;
+}
+
+
+.menu {
+    text-align: center;
+    align-items: center;
+    font-size: 1.5em;
+    line-height: 40px;
+    margin: 5px 0;
+
+
+}
+
+.menu > a {
+    color: #fff;
+    text-decoration: none;
+
+}
+
+.menu > a:hover {
+    color: #000000;
+}
+
+.menu > a:not(:last-child) {
+    margin-right: 5%;
+}
+
+.fixed {
+    z-index: 1;
+    background-color: rgba(255, 255, 255, 0.89);
+    backdrop-filter: blur(3px);
+}
+
+header.fixed #logo {
+    color: #343434;
+}
+
+.fixed .menu a {
+    color: #343434
+}
+
+.fixed .menu a:hover {
+    color: #2592b5
+}
+
+.fixed .menu a:focus {
+    color: #2592b5;
+}
+
+#top {
+    /*width: 60%;*/
+    text-align: center;
+    color: #fff;
+
+    align-items: center;
+
+}
+
+.drag-area {
+    font-family: "Poppins", sans-serif;
+    text-align: center;
+    border: 2px dashed #fff;
+    background-color: rgba(180, 180, 180, 0.43);
+    backdrop-filter: blur(5px);
+    padding: 5% 0;
+    height: 60%;
+    width: 700px;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.drag-area.active {
+    background-color: rgba(97, 255, 102, 0.4);
+}
+
+.drag-area.failed {
+    background-color: rgba(255, 31, 51, 0.4);
+}
+
+.drag-area .icon {
+    font-size: 100px;
+    color: #fff;
+}
+
+.drag-area p {
+    font-size: 30px;
+    font-weight: 500;
+    color: #fff;
+}
+
+.drag-area span {
+    font-size: 25px;
+    font-weight: 500;
+    color: #fff;
+    margin: 10px 0 15px 0;
+}
+
+.drag-area button {
+    padding: 10px 25px;
+    font-size: 20px;
+    font-weight: 500;
+    border: none;
+    outline: none;
+    background: #fff;
+    color: #12596e;
+    border-radius: 5px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.drag-area button:hover{
+    background-color: #efecec;
+}
+
+.drag-area button:active{
+    background-color: #c9c9c9;
+}
+
+
+.upload-file-area {
+    display: flex;
+    justify-content: center;
+    padding: 20%;
+    user-select: none;
+
+}

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="City Transport Optimization Web App">
+
+    <title>CityTransOpt</title>
+
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+    <link rel="stylesheet" type="text/css" href="css/adapt.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="icon" type="image/svg+xml" href="images/bus-transport.svg">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="js/scripts.js"></script>
+</head>
+<body>
+<header>
+    <div id="logo" onclick="slowScroll('#top')">
+        <span>CityTransOpt</span>
+    </div>
+    <div class="menu">
+        <a href="#" title="About us">About us</a>
+        <a href="#" title="Contact us">Contact us</a>
+        <a href="#" title="Frequently asked questions">FAQ</a>
+        <a href="#" title="Sign Up">Sign Up</a>
+        <a href="#" title="Login">Login</a>
+    </div>
+</header>
+<video autoplay muted loop>
+    <source src="video/clouds.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+</video>
+<div id="top">
+    <div class="upload-file-area">
+        <div class="drag-area">
+            <div class="icon">
+                <i class="fa-solid fa-cloud-upload"></i>
+            </div>
+            <p>Drag & Drop to Upload File</p>
+            <span>OR</span>
+            <button>Browse File</button>
+            <input type="file" id="fileInput" hidden>
+        </div>
+    </div>
+</div>
+</body>
+</html>
