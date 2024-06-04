@@ -8,6 +8,7 @@ import ua.parflare.transportoptimizerapp.entity.User;
 import ua.parflare.transportoptimizerapp.service.UserService;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
@@ -22,7 +23,13 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-    @PostMapping("/add")
+    @GetMapping("/find/{name}")
+    public ResponseEntity<Optional<User>> getUserByName(@PathVariable String name) {
+        Optional<User> user = userService.getUserByName(name);
+        return ResponseEntity.ok(user);
+    }
+
+    @PostMapping("/register")
     public ResponseEntity<String> addUser(@Valid @RequestBody User user) {
         try {
             userService.addUser(user);
@@ -30,12 +37,6 @@ public class UserController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-    }
-
-    @GetMapping("/find/{name}")
-    public ResponseEntity<User> getUserByName(@PathVariable String name) {
-        User user = userService.getUserByName(name);
-        return ResponseEntity.ok(user);
     }
 
 }
