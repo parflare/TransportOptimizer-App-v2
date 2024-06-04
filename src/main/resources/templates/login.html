@@ -1,15 +1,48 @@
 <!DOCTYPE html>
-<html xmlns:th="https://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" lang="ua">
 <head>
-    <title>Spring Security Example </title>
+    <title>Spring Security Example</title>
 </head>
 <body>
-
-<form action="/register" method="post">
-    <div><label> Email : <input type="text" name="email"/> </label></div>
-    <div><label> User Name : <input type="text" name="name"/> </label></div>
-    <div><label> Password: <input type="password" name="password"/> </label></div>
+<div id="messages"></div>
+<form id="registerForm">
+    <div><label> Email : <input type="text" name="email" autocomplete="email"/> </label></div>
+    <div><label> User Name : <input type="text" name="name" autocomplete="username"/> </label></div>
+    <div><label> Password: <input type="password" name="password" autocomplete="current-password"/> </label></div>
     <div><input type="submit" value="Register"/></div>
 </form>
+
+<script>
+    document.getElementById('registerForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const formData = new FormData(this);
+        const data = {
+            email: formData.get('email'),
+            name: formData.get('name'),
+            password: formData.get('password')
+        };
+
+        fetch('/api/users/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.text();
+            })
+            .then(message => {
+                document.getElementById('messages').innerText = message;
+            })
+            .catch(error => {
+                document.getElementById('messages').innerText = 'Error registering user: ' + error.message;
+            });
+    });
+</script>
 </body>
 </html>
