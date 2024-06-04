@@ -1,18 +1,18 @@
 package ua.parflare.transportoptimizerapp.service;
 
-import org.springframework.http.ResponseEntity;
 import ua.parflare.transportoptimizerapp.entity.User;
 
 import java.util.List;
+import java.util.Optional;
 
 
 public interface UserService {
 
-    public List<User> getAllUsers();
+    List<User> getAllUsers();
 
-    public User getUserByName(String name);
+    Optional<User> getUserByName(String name);
 
-    public User addUser(User user);
+    User addUser(User user);
 
 }
 
