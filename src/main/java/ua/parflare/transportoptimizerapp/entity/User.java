@@ -2,8 +2,9 @@ package ua.parflare.transportoptimizerapp.entity;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.*;
-import org.springframework.boot.context.properties.bind.DefaultValue;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Generated;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;

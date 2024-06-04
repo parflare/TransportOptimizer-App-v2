@@ -84,8 +84,6 @@ header #logo span {
     font-size: 1.5em;
     line-height: 40px;
     margin: 5px 0;
-
-
 }
 
 .menu > a {
@@ -128,9 +126,7 @@ header.fixed #logo {
     /*width: 60%;*/
     text-align: center;
     color: #fff;
-
     align-items: center;
-
 }
 
 .drag-area {
@@ -188,14 +184,13 @@ header.fixed #logo {
     user-select: none;
 }
 
-.drag-area button:hover{
+.drag-area button:hover {
     background-color: #efecec;
 }
 
-.drag-area button:active{
+.drag-area button:active {
     background-color: #c9c9c9;
 }
-
 
 .upload-file-area {
     display: flex;
