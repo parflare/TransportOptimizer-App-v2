@@ -78,7 +78,7 @@
             .then(message => {
                 document.getElementById('messages').innerText = message;
                 if (message === "User registered successfully") {
-                    window.location.href = "/home";  // Redirect to home page
+                    window.location.href = "/login";  // Redirect to home page
                 } else {
                     document.getElementById('messages').innerText = 'Not ok' + message;
                 }
