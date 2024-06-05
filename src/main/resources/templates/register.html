@@ -5,23 +5,25 @@
 </head>
 <body>
 <div id="messages"></div>
-<form id="loginForm">
-    <div><label> User Name : <input type="text" name="userName" autocomplete="username"/> </label></div>
+<form id="registerForm">
+    <div><label> Email : <input type="text" name="email" autocomplete="email"/> </label></div>
+    <div><label> User Name : <input type="text" name="name" autocomplete="username"/> </label></div>
     <div><label> Password: <input type="password" name="password" autocomplete="current-password"/> </label></div>
-    <div><input type="submit" value="Login"/></div>
+    <div><input type="submit" value="Register"/></div>
 </form>
 
 <script>
-    document.getElementById('loginForm').addEventListener('submit', function(event) {
+    document.getElementById('registerForm').addEventListener('submit', function(event) {
         event.preventDefault();
 
         const formData = new FormData(this);
         const data = {
-            username: formData.get('userName'),
+            email: formData.get('email'),
+            userName: formData.get('name'),
             password: formData.get('password')
         };
 
-        fetch('/login', {
+        fetch('/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -35,14 +37,10 @@
                 return response.text();
             })
             .then(message => {
-                if (message === "User authenticated successfully") {
-                    window.location.href = "/home";  // Redirect to home page
-                } else {
-                    document.getElementById('messages').innerText = 'Not ok' + message;
-                }
+                document.getElementById('messages').innerText = message;
             })
             .catch(error => {
-                document.getElementById('messages').innerText = 'Error logging in: ' + error.message;
+                document.getElementById('messages').innerText = 'Error registering user: ' + error.message;
             });
     });
 </script>

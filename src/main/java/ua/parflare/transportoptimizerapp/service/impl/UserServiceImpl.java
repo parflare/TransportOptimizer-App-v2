@@ -1,6 +1,11 @@
 package ua.parflare.transportoptimizerapp.service.impl;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ua.parflare.transportoptimizerapp.entity.User;
@@ -15,7 +20,7 @@ import java.util.UUID;
 
 @Service
 @AllArgsConstructor
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -25,18 +30,18 @@ public class UserServiceImpl implements UserService {
     }
 
     public Optional<User> getUserByName(String name) {
-        return userRepository.findByName(name);
+        return userRepository.findByUserName(name);
     }
 
     public User addUser(User user) {
-        String name = user.getName();
-        if (userRepository.findByName(name).isPresent()) {
+        String name = user.getUsername();
+        if (userRepository.findByUserName(name).isPresent()) {
             throw new IllegalArgumentException("Username already exists");
         }
 
         User newUser = User.builder()
                 .id(UUID.randomUUID())
-                .name(name)
+                .userName(name)
                 .password(passwordEncoder.encode(user.getPassword()))
                 .email(user.getEmail())
                 .active(true)
@@ -47,4 +52,9 @@ public class UserServiceImpl implements UserService {
     }
 
 
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository.findByUserName(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
 }
