@@ -39,7 +39,7 @@ $(document).ready(function () {
         dropArea.classList.remove("failed");
         dropArea.classList.add("active");
     });
-//If user Drag File Over DropArea
+    //If user Drag File Over DropArea
     dropArea.addEventListener("dragover", (event) => {
         event.preventDefault(); //preventing from default behaviour
         changeClasses(iconElement, 'fa-solid', 'fa-cloud-upload');
@@ -48,13 +48,13 @@ $(document).ready(function () {
         dragText.textContent = "Release to Upload File";
     });
 
-//If user leave dragged File from DropArea
+    //If user leave dragged File from DropArea
     dropArea.addEventListener("dragleave", () => {
         dropArea.classList.remove("active");
         dragText.textContent = "Drag & Drop to Upload File";
     });
 
-//If user drop File on DropArea
+    //If user drop File on DropArea
     dropArea.addEventListener("drop", (event) => {
         event.preventDefault(); //preventing from default behaviour
         //getting user select file and [0] this means if user select multiple files then we'll select only the first one
@@ -89,6 +89,8 @@ $(document).ready(function () {
             body: formData
         })
             .then(response => {
+                console.log(response);
+
                 if (response.ok) {
                     response.text().then(result => {
                         console.log(result);
@@ -105,10 +107,8 @@ $(document).ready(function () {
                             dropArea.classList.remove("active");
                             dropArea.classList.add("failed");
                             dragText.textContent = error;
-                            dragSpan.textContent = 'but you can change file';
+                            dragSpan.textContent = 'try to load new file';
                             changeClasses(iconElement, 'fa-solid', 'fa-cloud');
-
-
                         });
                 }
             })
