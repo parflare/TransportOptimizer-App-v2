@@ -2,7 +2,6 @@ package ua.parflare.transportoptimizerapp.controller;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import ua.parflare.transportoptimizerapp.entity.User;
-import ua.parflare.transportoptimizerapp.service.UserService;
 import ua.parflare.transportoptimizerapp.service.impl.UserServiceImpl;
 
 @Controller
@@ -38,13 +36,9 @@ public class AuthorizationController {
         return "index"; // Назва HTML файлу без розширення
     }
 
-    @GetMapping("/hello")
-    public String hello() {
-        return "hello"; // Назва HTML файлу без розширення
-    }
-
     @GetMapping("/logout")
     public String logout() {
+        System.out.println("logout()");
         return "redirect:/login"; // перенаправляємо користувача на сторінку успішного виходу
     }
 

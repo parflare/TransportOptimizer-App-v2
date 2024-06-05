@@ -1,19 +1,58 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" lang="ua">
+<!doctype html>
+<html lang="en">
 <head>
-    <title>Spring Security Example</title>
+    <title>Registration form</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="css/register.css">
+
 </head>
 <body>
-<div id="messages"></div>
-<form id="registerForm">
-    <div><label> Email : <input type="text" name="email" autocomplete="email"/> </label></div>
-    <div><label> User Name : <input type="text" name="name" autocomplete="username"/> </label></div>
-    <div><label> Password: <input type="password" name="password" autocomplete="current-password"/> </label></div>
-    <div><input type="submit" value="Register"/></div>
-</form>
-
+<section class="ftco-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 text-center mb-5">
+                <h2 class="heading-section">Registration form</h2>
+                <div id="messages"></div>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-md-7 col-lg-5">
+                <div class="login-wrap p-4 p-md-5">
+                    <div class="icon d-flex align-items-center justify-content-center">
+                        <span class="fa fa-user-o"></span>
+                    </div>
+                    <h3 class="text-center mb-4">Registration</h3>
+                    <form class="register-form" id="registerForm">
+                        <div class="form-group">
+                            <input type="text" class="form-control rounded-left" placeholder="Email" name="email"
+                                   required>
+                        </div>
+                        <div class="form-group d-flex">
+                            <input type="text" class="form-control rounded-left" placeholder="Username" name="name"
+                                   required>
+                        </div>
+                        <div class="form-group d-flex">
+                            <input type="password" class="form-control rounded-left" placeholder="Password" name="password"
+                                   required>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="form-control btn btn-primary rounded submit px-3">Register
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 <script>
-    document.getElementById('registerForm').addEventListener('submit', function(event) {
+    document.getElementById('registerForm').addEventListener('submit', function (event) {
         event.preventDefault();
 
         const formData = new FormData(this);
@@ -38,6 +77,11 @@
             })
             .then(message => {
                 document.getElementById('messages').innerText = message;
+                if (message === "User registered successfully") {
+                    window.location.href = "/home";  // Redirect to home page
+                } else {
+                    document.getElementById('messages').innerText = 'Not ok' + message;
+                }
             })
             .catch(error => {
                 document.getElementById('messages').innerText = 'Error registering user: ' + error.message;
@@ -46,3 +90,4 @@
 </script>
 </body>
 </html>
+
