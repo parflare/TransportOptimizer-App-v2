@@ -1,15 +1,50 @@
 <!DOCTYPE html>
-<html xmlns:th="https://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" lang="ua">
 <head>
-    <title>Spring Security Example </title>
+    <title>Spring Security Example</title>
 </head>
 <body>
-
-<form action="/register" method="post">
-    <div><label> Email : <input type="text" name="email"/> </label></div>
-    <div><label> User Name : <input type="text" name="name"/> </label></div>
-    <div><label> Password: <input type="password" name="password"/> </label></div>
-    <div><input type="submit" value="Register"/></div>
+<div id="messages"></div>
+<form id="loginForm">
+    <div><label> User Name : <input type="text" name="userName" autocomplete="username"/> </label></div>
+    <div><label> Password: <input type="password" name="password" autocomplete="current-password"/> </label></div>
+    <div><input type="submit" value="Login"/></div>
 </form>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const formData = new FormData(this);
+        const data = {
+            username: formData.get('userName'),
+            password: formData.get('password')
+        };
+
+        fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.text();
+            })
+            .then(message => {
+                if (message === "User authenticated successfully") {
+                    window.location.href = "/home";  // Redirect to home page
+                } else {
+                    document.getElementById('messages').innerText = 'Not ok' + message;
+                }
+            })
+            .catch(error => {
+                document.getElementById('messages').innerText = 'Error logging in: ' + error.message;
+            });
+    });
+</script>
 </body>
 </html>

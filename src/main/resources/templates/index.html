@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="uk" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -24,8 +24,7 @@
         <a href="#" title="About us">About us</a>
         <a href="#" title="Contact us">Contact us</a>
         <a href="#" title="Frequently asked questions">FAQ</a>
-        <a href="/login" title="Login">Sign Up</a>
-        <a href="#" title="Logout" hidden>Logout</a>
+        <a th:href="@{/logout}" title="Logout">Logout</a>
     </div>
 </header>
 <video autoplay muted loop>

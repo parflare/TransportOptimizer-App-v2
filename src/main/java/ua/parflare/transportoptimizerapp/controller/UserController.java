@@ -2,6 +2,7 @@ package ua.parflare.transportoptimizerapp.controller;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.parflare.transportoptimizerapp.entity.User;
@@ -12,7 +13,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
@@ -27,16 +28,6 @@ public class UserController {
     public ResponseEntity<Optional<User>> getUserByName(@PathVariable String name) {
         Optional<User> user = userService.getUserByName(name);
         return ResponseEntity.ok(user);
-    }
-
-    @PostMapping("/register")
-    public ResponseEntity<String> addUser(@Valid @RequestBody User user) {
-        try {
-            userService.addUser(user);
-            return ResponseEntity.ok("User registered successfully");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
     }
 
 }
