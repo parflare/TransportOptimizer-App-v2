@@ -27,7 +27,7 @@ public class StationData {
             stationName = stationName.substring(0, stationName.length() - " ".length());
         }
         if (stationName.startsWith(" ")) {
-            stationName = stationName.replaceFirst("^\\s+", "");;
+            stationName = stationName.replaceFirst("^\\s+", "");
         }
         if (stationName.contains("\"")){
             int firstQuoteIndex = stationName.indexOf("\"");
@@ -101,9 +101,7 @@ public class StationData {
         sb.append("stationName='").append(stationName).append('\'');
         sb.append(", routeInfo='").append(routeGeneralInfo).append('\'');
         sb.append(", routeTime=[");
-        routeTime.forEach( date -> {
-            sb.append(new SimpleDateFormat("HH:mm").format((date))).append(", ");
-        });
+        routeTime.forEach( date -> sb.append(new SimpleDateFormat("HH:mm").format((date))).append(", "));
         sb.delete(sb.length() - 2, sb.length());
         sb.append("]}");
         return sb.toString();

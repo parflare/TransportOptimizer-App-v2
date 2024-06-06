@@ -100,26 +100,23 @@ public class DocxGenerator {
         mergeCellsInColumns(table);
 
 
-        table.getRows().forEach(row -> {
-            row.getTableCells().forEach(cell -> {
-                cell.getParagraphs().forEach(paragraph -> {
-                    paragraph.setAlignment(ParagraphAlignment.CENTER);
+        table.getRows().forEach(row -> row.getTableCells().forEach(cell -> {
+            cell.getParagraphs().forEach(paragraph -> {
+                paragraph.setAlignment(ParagraphAlignment.CENTER);
 
-                    paragraph.setSpacingBetween(1);
-                    paragraph.setSpacingAfter(0);
-                    paragraph.setSpacingBefore(0);
+                paragraph.setSpacingBetween(1);
+                paragraph.setSpacingAfter(0);
+                paragraph.setSpacingBefore(0);
 
-                    paragraph.getRuns().forEach(run -> {
-                        run.setFontFamily("Times New Roman");
-                        run.setFontSize(14);
-                    });
+                paragraph.getRuns().forEach(run -> {
+                    run.setFontFamily("Times New Roman");
+                    run.setFontSize(14);
                 });
-                cell.setWidthType(TableWidthType.AUTO);
-                cell.setVerticalAlignment(XWPFTableCell.XWPFVertAlign.CENTER);
-
             });
+            cell.setWidthType(TableWidthType.AUTO);
+            cell.setVerticalAlignment(XWPFTableCell.XWPFVertAlign.CENTER);
 
-        });
+        }));
 
     }
 

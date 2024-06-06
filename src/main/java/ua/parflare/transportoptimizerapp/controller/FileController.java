@@ -1,14 +1,14 @@
 package ua.parflare.transportoptimizerapp.controller;
 
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import ua.parflare.transportoptimizerapp.service.FileService;
 
@@ -42,7 +42,7 @@ public class FileController {
     }
 
     @GetMapping("/download")
-    public ResponseEntity<InputStreamResource> createZipWithReports(@RequestParam("userName") String userName, HttpServletResponse response) {
+    public ResponseEntity<InputStreamResource> createZipWithReports(@RequestParam("userName") String userName) {
         try {
             byte[] zipData = fileService.createZipWithReports(userName);
 
