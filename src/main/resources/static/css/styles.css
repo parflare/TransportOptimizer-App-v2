@@ -199,3 +199,8 @@ header.fixed #logo {
     user-select: none;
 
 }
+
+.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+}

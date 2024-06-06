@@ -11,6 +11,9 @@ $(document).on("scroll", function () {
         $("header").attr("class", "fixed");
 });
 
+var username = null;
+
+
 $(document).ready(function () {
 
     document.querySelectorAll('.menu a').forEach(link => {
@@ -26,6 +29,7 @@ $(document).ready(function () {
         dragSpan = dropArea.querySelector("span"),
         button = dropArea.querySelector("button"),
         input = dropArea.querySelector("input");
+    username = document.getElementById('username').innerText.trim()
     var file; //this is a global variable and we'll use it inside multiple functions
 
 
@@ -83,23 +87,24 @@ $(document).ready(function () {
     function loadFile() {
         var formData = new FormData();
         formData.append("file", file);
-
+        formData.append("userName", username);
         fetch('/upload', {
             method: 'POST',
             body: formData
         })
             .then(response => {
-                console.log(response);
-
                 if (response.ok) {
                     response.text().then(result => {
                         console.log(result);
                         changeClasses(iconElement, 'fa-solid', 'fa-cloud-download');
                         dragText.textContent = result;
                         dragSpan.textContent = 'but you can change file';
+
+                        document.getElementById('processFileButton').classList.remove('disabled');
                     })
                 } else {
                     response.text().then(errorMessage => {
+                        document.getElementById('processFileButton').classList.add('disabled');
                         throw new Error(errorMessage);
                     })
                         .catch(error => {
@@ -114,4 +119,56 @@ $(document).ready(function () {
             })
 
     }
+
+
 });
+
+
+// Функція для запуску обробки файлу на сервері
+async function processFile() {
+    const response = await fetch(`/process?userName=${username}`, {
+        method: 'POST'
+    });
+
+    if (response.ok) {
+        response.text().then(result => {
+            console.log(result);
+        });
+        // Показуємо кнопку "Download zip"
+        document.getElementById('downloadZipButton').classList.remove('disabled');
+    } else {
+        document.getElementById('downloadZipButton').classList.add('disabled');
+        console.error('Помилка при обробці файлу');
+    }
+}
+
+
+function downloadFile() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', `/download?userName=${username}`, true);
+    xhr.responseType = 'blob';
+
+    xhr.onload = function(e) {
+
+        if (this.status === 200) {
+            console.log('Response received successfully.');
+            var blob = new Blob([this.response], { type: 'application/zip' });
+            var url = window.URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'reports.zip';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+        } else {
+            console.error('Failed to download file:', this.statusText);
+        }
+    };
+
+    xhr.onerror = function() {
+        console.error('Network error occurred.');
+    };
+
+    xhr.send();
+
+}

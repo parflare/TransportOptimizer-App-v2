@@ -21,9 +21,11 @@
         <span>CityTransOpt</span>
     </div>
     <div class="menu">
-        <a href="#" title="About us">About us</a>
-        <a href="#" title="Contact us">Contact us</a>
-        <a href="#" title="Frequently asked questions">FAQ</a>
+        <a id="processFileButton" class="disabled" href="#" title="Process file"
+           onclick="processFile()">Process file</a>
+        <a id="downloadZipButton" class="disabled" href="#" title="Download zip"
+           onclick="downloadFile()">Download zip</a>
+        <a href="#" title="Profile" id="username" th:text="${#authentication.principal.username}">Profile</a>
         <a th:href="@{/logout}" title="Logout">Logout</a>
     </div>
 </header>
@@ -46,7 +48,7 @@
     </div>
 </div>
 <script>
-    
+
 </script>
 </body>
 </html>

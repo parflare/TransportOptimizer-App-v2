@@ -1,13 +1,19 @@
 package ua.parflare.transportoptimizerapp.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ua.parflare.transportoptimizerapp.service.FileService;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,38 +22,43 @@ public class FileController {
     private final FileService fileService;
 
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> uploadFile(@RequestParam("userName") String userName, @RequestParam("file") MultipartFile file) {
         try {
-            String responseMessage = fileService.saveFile(file);
-            return ResponseEntity.ok(responseMessage);
+            String result = fileService.saveFile(userName, file);
+            return ResponseEntity.ok(result);
         } catch (IOException e) {
-            return ResponseEntity.status(500).body("Failed to upload file");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
     @PostMapping("/process")
-    public ResponseEntity<String> processFile(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> processFile(@RequestParam("userName") String userName) {
         try {
-            String responseMessage = fileService.processAndGenerateReport(file);
-            return ResponseEntity.ok(responseMessage);
+            String result = fileService.processAndGenerateReport(userName);
+            return ResponseEntity.ok(result);
         } catch (IOException e) {
-            return ResponseEntity.status(500).body("Failed to process file");
-        }
-    }
-
-    @GetMapping("/create-zip")
-    public ResponseEntity<String> createZip() {
-        try {
-            String responseMessage = fileService.createZipWithReports();
-            return ResponseEntity.ok(responseMessage);
-        } catch (IOException e) {
-            return ResponseEntity.status(500).body("Failed to create zip archive");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
     @GetMapping("/download")
-    public ResponseEntity<Resource> downloadReports() {
-        // Реалізація завантаження звітів
-        return null;
+    public ResponseEntity<InputStreamResource> createZipWithReports(@RequestParam("userName") String userName, HttpServletResponse response) {
+        try {
+            byte[] zipData = fileService.createZipWithReports(userName);
+
+            // Встановлення заголовків для скачування файлу
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=reports.zip");
+            headers.setContentLength(zipData.length); // Додано розмір файлу
+
+            // Повертаємо потік з даними
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new InputStreamResource(new ByteArrayInputStream(zipData)));
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
+
+
 }
