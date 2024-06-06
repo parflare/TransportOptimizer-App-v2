@@ -11,6 +11,9 @@ $(document).on("scroll", function () {
         $("header").attr("class", "fixed");
 });
 
+var username = null;
+
+
 $(document).ready(function () {
 
     document.querySelectorAll('.menu a').forEach(link => {
@@ -26,6 +29,7 @@ $(document).ready(function () {
         dragSpan = dropArea.querySelector("span"),
         button = dropArea.querySelector("button"),
         input = dropArea.querySelector("input");
+    username = document.getElementById('username').innerText.trim()
     var file; //this is a global variable and we'll use it inside multiple functions
 
 
@@ -39,7 +43,7 @@ $(document).ready(function () {
         dropArea.classList.remove("failed");
         dropArea.classList.add("active");
     });
-//If user Drag File Over DropArea
+    //If user Drag File Over DropArea
     dropArea.addEventListener("dragover", (event) => {
         event.preventDefault(); //preventing from default behaviour
         changeClasses(iconElement, 'fa-solid', 'fa-cloud-upload');
@@ -48,13 +52,13 @@ $(document).ready(function () {
         dragText.textContent = "Release to Upload File";
     });
 
-//If user leave dragged File from DropArea
+    //If user leave dragged File from DropArea
     dropArea.addEventListener("dragleave", () => {
         dropArea.classList.remove("active");
         dragText.textContent = "Drag & Drop to Upload File";
     });
 
-//If user drop File on DropArea
+    //If user drop File on DropArea
     dropArea.addEventListener("drop", (event) => {
         event.preventDefault(); //preventing from default behaviour
         //getting user select file and [0] this means if user select multiple files then we'll select only the first one
@@ -83,7 +87,7 @@ $(document).ready(function () {
     function loadFile() {
         var formData = new FormData();
         formData.append("file", file);
-
+        formData.append("userName", username);
         fetch('/upload', {
             method: 'POST',
             body: formData
@@ -95,9 +99,12 @@ $(document).ready(function () {
                         changeClasses(iconElement, 'fa-solid', 'fa-cloud-download');
                         dragText.textContent = result;
                         dragSpan.textContent = 'but you can change file';
+
+                        document.getElementById('processFileButton').classList.remove('disabled');
                     })
                 } else {
                     response.text().then(errorMessage => {
+                        document.getElementById('processFileButton').classList.add('disabled');
                         throw new Error(errorMessage);
                     })
                         .catch(error => {
@@ -105,13 +112,63 @@ $(document).ready(function () {
                             dropArea.classList.remove("active");
                             dropArea.classList.add("failed");
                             dragText.textContent = error;
-                            dragSpan.textContent = 'but you can change file';
+                            dragSpan.textContent = 'try to load new file';
                             changeClasses(iconElement, 'fa-solid', 'fa-cloud');
-
-
                         });
                 }
             })
 
     }
+
+
 });
+
+
+// Функція для запуску обробки файлу на сервері
+async function processFile() {
+    const response = await fetch(`/process?userName=${username}`, {
+        method: 'POST'
+    });
+
+    if (response.ok) {
+        response.text().then(result => {
+            console.log(result);
+        });
+        // Показуємо кнопку "Download zip"
+        document.getElementById('downloadZipButton').classList.remove('disabled');
+    } else {
+        document.getElementById('downloadZipButton').classList.add('disabled');
+        console.error('Помилка при обробці файлу');
+    }
+}
+
+
+function downloadFile() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', `/download?userName=${username}`, true);
+    xhr.responseType = 'blob';
+
+    xhr.onload = function(e) {
+
+        if (this.status === 200) {
+            console.log('Response received successfully.');
+            var blob = new Blob([this.response], { type: 'application/zip' });
+            var url = window.URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'reports.zip';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+        } else {
+            console.error('Failed to download file:', this.statusText);
+        }
+    };
+
+    xhr.onerror = function() {
+        console.error('Network error occurred.');
+    };
+
+    xhr.send();
+
+}
