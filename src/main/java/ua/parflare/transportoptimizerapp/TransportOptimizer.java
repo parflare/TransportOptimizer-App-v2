@@ -42,9 +42,9 @@ public class TransportOptimizer {
                 if (Math.random() < MUTATION_RATE) {
                     mutate(offspring);
                 }
-                if (isWithinAllowedDeviation(offspring)) {
+                //if (isWithinAllowedDeviation(offspring)) {
                     newPopulation.add(offspring);
-                }
+                //}
                 tmpFitness = offspring.getFitness();
             }
             updateMaxScore(newPopulation);
