@@ -1,6 +1,7 @@
 package ua.parflare.transportoptimizerapp.entity;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -11,12 +12,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Getter
+@Setter
 public class StationData {
     private final String stationName;
     private final String routeGeneralInfo;
     private String routeNumber;
     private String routeName;
     private String routeWorkingDays;
+    private int miniFitness;
 
     private ArrayList<Date> routeTime;
 
@@ -48,8 +51,11 @@ public class StationData {
         this.stationName = stationName;
         this.routeGeneralInfo = routeGeneralInfo;
         this.routeTime = routeTime;
+
         extractGeneralInfo(routeGeneralInfo);
     }
+
+
 
 
     public void combineRouteTime(ArrayList<Date> routeTime) {
@@ -91,6 +97,9 @@ public class StationData {
         String lastMatch = null;
         while (matcher.find()) {
             lastMatch = matcher.group(1);
+        }
+        if(lastMatch == null || lastMatch.contains("щоденно") ){
+            return "щоденно";
         }
         return lastMatch;
     }
