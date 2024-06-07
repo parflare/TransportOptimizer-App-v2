@@ -34,7 +34,7 @@ public class TransportOptimizer {
         while (currentGeneration < GENERATIONS) {
 
             newPopulation = new ArrayList<>(GENERATIONS);
-            newPopulation.add(original);
+            //newPopulation.add(original);
             while (newPopulation.size() < POPULATION_SIZE) {
                 DataStructure parent1 = selectParent();
                 DataStructure parent2 = selectParent();
@@ -42,9 +42,9 @@ public class TransportOptimizer {
                 if (Math.random() < MUTATION_RATE) {
                     mutate(offspring);
                 }
-                //if (isWithinAllowedDeviation(offspring)) {
+                if (isWithinAllowedDeviation(offspring)) {
                     newPopulation.add(offspring);
-                //}
+                }
                 tmpFitness = offspring.getFitness();
             }
             updateMaxScore(newPopulation);
@@ -113,6 +113,7 @@ public class TransportOptimizer {
 
     private int countConflicts(ArrayList<StationData> stationDataList) {
         int conflicts = 0;
+        Random rand = new Random();
         Map<String, Map<String, ArrayList<Date>>> times = new HashMap<>();
 
         // Collect times for each station and working days
@@ -138,11 +139,12 @@ public class TransportOptimizer {
                     if (i + 1 < timeList.size()) {
                         Date nextTime = timeList.get(i + 1);
                         long interval = (nextTime.getTime() - currentTime.getTime()) / (60 * 1000); // Interval in minutes
-                        if (interval < 2) {
+                        if (interval < 1) {
                             if (!filteredTimes.contains(currentTime)) {
                                 filteredTimes.add(currentTime);
                             }
                             filteredTimes.add(nextTime);
+
                         }
                     }
                 }
@@ -151,6 +153,40 @@ public class TransportOptimizer {
             }
         }
         return conflicts;
+    }
+
+    private void coregData(ArrayList<StationData> stationDataList) {
+        Random rand = new Random();
+        Map<String, Map<String, ArrayList<Date>>> times = new HashMap<>();
+
+        // Collect times for each station and working days
+        for (StationData data : stationDataList) {
+            times.computeIfAbsent(data.getStationName(), k -> new HashMap<>())
+                    .computeIfAbsent(data.getRouteWorkingDays(), k -> new ArrayList<>())
+                    .addAll(data.getRouteTime());
+        }
+
+        // Sort and print times for each station and working days
+        for (Map.Entry<String, Map<String, ArrayList<Date>>> stationEntry : times.entrySet()) {
+                        for (Map.Entry<String, ArrayList<Date>> daysEntry : stationEntry.getValue().entrySet()) {
+                ArrayList<Date> timeList = daysEntry.getValue();
+                Collections.sort(timeList);
+
+                for (int i = 0; i < timeList.size(); i++) {
+                    Date currentTime = timeList.get(i);
+                    if (i + 1 < timeList.size()) {
+                        Date nextTime = timeList.get(i + 1);
+                        long interval = (nextTime.getTime() - currentTime.getTime()) / (60 * 1000); // Interval in minutes
+                        if (interval < 1) {
+                            if(rand.nextInt(3000) == 5){
+                                nextTime.setTime(nextTime.getTime() + 2 * 60 * 1000);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
     }
 
     private int countMiniConflicts(ArrayList<Date> times) {
@@ -193,7 +229,7 @@ public class TransportOptimizer {
             }
             newRouteData.add(new StationData(tmpStationData.getStationName(), tmpStationData.getRouteGeneralInfo(), newDates));
         }
-
+        coregData(newRouteData);
         return new DataStructure(newRouteData);
     }
 
@@ -220,10 +256,10 @@ public class TransportOptimizer {
                     }
                 }
 
-                if (conflictCount >= 50) {
-                    shiftRandomElements(schedule.getRouteTime(), index);
-                    conflict = false; // Exit loop after shifting times
-                }
+//                if (conflictCount >= 50) {
+//                    shiftRandomElements(schedule.getRouteTime(), index);
+//                    conflict = false; // Exit loop after shifting times
+//                }
             } while (conflict);
 
             schedule.getRouteTime().set(index, newTime);
