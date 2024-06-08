@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ua.parflare.transportoptimizerapp.entity.StationData;
 import ua.parflare.transportoptimizerapp.util.DocxGenerator;
 import ua.parflare.transportoptimizerapp.util.ExcelProcessor;
+import ua.parflare.transportoptimizerapp.util.TransportOptimizerUtil;
 import ua.parflare.transportoptimizerapp.util.ZipUtil;
 
 import java.io.ByteArrayOutputStream;
@@ -24,9 +25,10 @@ public class FileService {
     private final ExcelProcessor excelProcessor;
     private final DocxGenerator docxGenerator;
     private final ZipUtil zipUtil;
+    private final TransportOptimizerUtil optimizerUtil;
 
     // Map для збереження файлів у пам'яті по імені користувача
-    private final Map<String, byte[]> userFileStorage = new ConcurrentHashMap<>();
+    private final Map<String, ArrayList<StationData>> userFileDataStorage = new ConcurrentHashMap<>();
     private final Map<String, Map<String, byte[]>> userReportStorage = new ConcurrentHashMap<>();
 
 
@@ -37,45 +39,45 @@ public class FileService {
         if (!isExcelFile(fileName)) {
             throw new IOException(fileName + " has invalid file format (requires Excel)");
         }
-
         // Зчитуємо байти з MultipartFile
         byte[] fileBytes = file.getBytes();
+        ArrayList<StationData> data = excelProcessor.processExcelFile(fileBytes);
 
         // Зберігаємо байти у мапі
-        userFileStorage.put(username, fileBytes);
+        userFileDataStorage.put(username, data);
 
         return "File " + fileName + " uploaded successfully";
     }
 
-    private ArrayList<StationData> optimize(byte[] file) throws IOException {
-        return excelProcessor.processExcelFile(file);
-        //TODO
+    public String optimize(String username) throws IOException {
+        var data = userFileDataStorage.get(username);
+
+        if (data == null) {
+            throw new IOException("File not found in memory for user " + username);
+        }
+        ArrayList<StationData> optimizedData = optimizerUtil.optimizeSchedule(data);
+        userFileDataStorage.put(username, optimizedData);
+        return "File optimized successfully";
     }
 
     public String processAndGenerateReport(String username) throws IOException {
-        var file = userFileStorage.get(username);
+        var data = userFileDataStorage.get(username);
 
-        if (file == null) {
+        if (data == null) {
             throw new IOException("File not found in memory for user " + username);
         }
 
-        ArrayList<StationData> tmpData = optimize(file);
-
         userReportStorage
                 .computeIfAbsent(username, k -> new ConcurrentHashMap<>())
-                .put("!new_data.xlsx", excelProcessor.createExcelFile(tmpData));
+                .put("!new_data.xlsx", excelProcessor.createExcelFile(data));
 
-        ArrayList<StationData> stationData = combineStation(tmpData);
+        ArrayList<StationData> stationData = combineStation(data);
 
         ArrayList<String> stationNames = getUniqueStationNames(stationData);
 
         Collections.sort(stationNames);
 
         int totalIteration = stationNames.size();
-
-//        for (var name : stationData) {
-//            System.out.println(name.getStationName());
-//        }
 
         System.out.println();
 

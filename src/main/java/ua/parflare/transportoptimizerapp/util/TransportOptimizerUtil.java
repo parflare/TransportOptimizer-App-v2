@@ -1,29 +1,43 @@
-package ua.parflare.transportoptimizerapp;
+package ua.parflare.transportoptimizerapp.util;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.stereotype.Component;
 import ua.parflare.transportoptimizerapp.entity.StationData;
 
 import java.util.*;
 
-public class TransportOptimizer {
+@Component
+public class TransportOptimizerUtil {
 
     private static final int GENERATIONS = 300;
     private static final double MUTATION_RATE = 0.08;
     private static final int MAX_INCREMENT_MINUTES = 5;
     private static final int MAX_DECREMENT_MINUTES = 5;
     private static final int POPULATION_SIZE = 30;
-    private final DataStructure original;
+    private DataStructure original;
     private ArrayList<DataStructure> population = new ArrayList<>();
     private DataStructure maxScoreData;
 
-    public TransportOptimizer(ArrayList<StationData> initialPopulation) {
+
+    public TransportOptimizerUtil() {
+        original = null;
+        maxScoreData = null;
+    }
+
+    public void initializeStationData(ArrayList<StationData> initialPopulation) {
         original = new DataStructure(initialPopulation);
         maxScoreData = new DataStructure(original);
         population.add(new DataStructure(original.getData()));
     }
 
-    public ArrayList<StationData> optimizeSchedule() {
+    public ArrayList<StationData> optimizeSchedule(ArrayList<StationData> initialPopulation) {
+        initializeStationData(initialPopulation);
+
+        original = new DataStructure(initialPopulation);
+        maxScoreData = new DataStructure(original);
+        population.add(new DataStructure(original.getData()));
+        System.out.println();
         int currentGeneration = 0;
         int attempt = 0;
 
@@ -31,11 +45,9 @@ public class TransportOptimizer {
         int origFitness = evaluateFitness(original.getData());
         ArrayList<DataStructure> newPopulation;
         int tmpFitness = 0;
-        //System.out.println();
         while (currentGeneration < GENERATIONS && tmpFitness != maxFitness) {
 
             newPopulation = new ArrayList<>(GENERATIONS);
-            //newPopulation.add(original);
             while (newPopulation.size() < POPULATION_SIZE) {
                 attempt++;
                 DataStructure parent1 = selectParent();
@@ -61,7 +73,6 @@ public class TransportOptimizer {
         }
 
         System.out.println();
-        System.out.println("Max score: " + maxScoreData.getFitness());
 
         return maxScoreData.getData();
     }
@@ -143,27 +154,27 @@ public class TransportOptimizer {
             String stationName = stationEntry.getKey();
             //System.out.println("Station: " + stationName);
 
-                for (Map.Entry<String, ArrayList<Date>> daysEntry : stationEntry.getValue().entrySet()) {
-                    ArrayList<Date> timeList = daysEntry.getValue();
-                    Collections.sort(timeList);
+            for (Map.Entry<String, ArrayList<Date>> daysEntry : stationEntry.getValue().entrySet()) {
+                ArrayList<Date> timeList = daysEntry.getValue();
+                Collections.sort(timeList);
 
-                    ArrayList<Date> filteredTimes = new ArrayList<>();
+                ArrayList<Date> filteredTimes = new ArrayList<>();
 
-                    for (int i = 0; i < timeList.size(); i++) {
-                        Date currentTime = timeList.get(i);
-                        if (i + 1 < timeList.size()) {
-                            Date nextTime = timeList.get(i + 1);
-                            long interval = (nextTime.getTime() - currentTime.getTime()) / (60 * 1000); // Interval in minutes
-                            if (interval < 1) {
-                                if (!filteredTimes.contains(currentTime)) {
-                                    filteredTimes.add(currentTime);
-                                }
-                                filteredTimes.add(nextTime);
+                for (int i = 0; i < timeList.size(); i++) {
+                    Date currentTime = timeList.get(i);
+                    if (i + 1 < timeList.size()) {
+                        Date nextTime = timeList.get(i + 1);
+                        long interval = (nextTime.getTime() - currentTime.getTime()) / (60 * 1000); // Interval in minutes
+                        if (interval < 1) {
+                            if (!filteredTimes.contains(currentTime)) {
+                                filteredTimes.add(currentTime);
                             }
+                            filteredTimes.add(nextTime);
                         }
                     }
-                    conflicts += filteredTimes.size();
                 }
+                conflicts += filteredTimes.size();
+            }
 
         }
         return conflicts;
@@ -238,9 +249,9 @@ public class TransportOptimizer {
                         long interval = (nextTime.getTime() - currentTime.getTime()) / (60 * 1000); // Interval in minutes
                         if (interval < 1) {
                             if (rand.nextBoolean()) {
-                                nextTime.setTime(nextTime.getTime() + (rand.nextInt(MAX_INCREMENT_MINUTES-1)+1) * 60 * 1000);
+                                nextTime.setTime(nextTime.getTime() + (rand.nextInt(MAX_INCREMENT_MINUTES/2) + 1) * 60 * 1000);
                             } else {
-                                currentTime.setTime(currentTime.getTime() - (rand.nextInt(MAX_DECREMENT_MINUTES-1)+1) * 60 * 1000);
+                                currentTime.setTime(currentTime.getTime() - (rand.nextInt(MAX_DECREMENT_MINUTES/2) + 1) * 60 * 1000);
                             }
                         }
                     }

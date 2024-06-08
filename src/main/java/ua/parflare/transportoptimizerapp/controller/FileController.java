@@ -31,6 +31,16 @@ public class FileController {
         }
     }
 
+    @PostMapping("/optimize")
+    public ResponseEntity<String>  optimizeFile(@RequestParam("userName") String userName) {
+        try {
+            String result = fileService.optimize(userName);
+            return ResponseEntity.ok(result);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
     @PostMapping("/process")
     public ResponseEntity<String> processFile(@RequestParam("userName") String userName) {
         try {
