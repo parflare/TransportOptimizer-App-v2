@@ -10,47 +10,53 @@ public class TransportOptimizer {
 
     private static final int GENERATIONS = 300;
     private static final double MUTATION_RATE = 0.08;
-    private static final int MAX_INCREMENT_MINUTES = 4;
-    private static final int MAX_DECREMENT_MINUTES = 2;
-    private static final int POPULATION_SIZE = 50;
-    private ArrayList<DataStructure> population = new ArrayList<>();
+    private static final int MAX_INCREMENT_MINUTES = 5;
+    private static final int MAX_DECREMENT_MINUTES = 5;
+    private static final int POPULATION_SIZE = 30;
     private final DataStructure original;
-
+    private ArrayList<DataStructure> population = new ArrayList<>();
     private DataStructure maxScoreData;
 
     public TransportOptimizer(ArrayList<StationData> initialPopulation) {
         original = new DataStructure(initialPopulation);
         maxScoreData = new DataStructure(original);
-        population.add(original);
+        population.add(new DataStructure(original.getData()));
     }
 
     public ArrayList<StationData> optimizeSchedule() {
         int currentGeneration = 0;
+        int attempt = 0;
+
         int maxFitness = initMaxFitness(original.getData());
-        int origFitness= evaluateFitness(original.getData());
+        int origFitness = evaluateFitness(original.getData());
         ArrayList<DataStructure> newPopulation;
         int tmpFitness = 0;
         //System.out.println();
-        while (currentGeneration < GENERATIONS) {
+        while (currentGeneration < GENERATIONS && tmpFitness != maxFitness) {
 
             newPopulation = new ArrayList<>(GENERATIONS);
             //newPopulation.add(original);
             while (newPopulation.size() < POPULATION_SIZE) {
+                attempt++;
                 DataStructure parent1 = selectParent();
                 DataStructure parent2 = selectParent();
                 DataStructure offspring = crossover(parent1, parent2);
                 if (Math.random() < MUTATION_RATE) {
                     mutate(offspring);
                 }
+                offspring.reevaData();
+
                 if (isWithinAllowedDeviation(offspring)) {
                     newPopulation.add(offspring);
                 }
                 tmpFitness = offspring.getFitness();
+                System.out.printf("\rcurrentFitness: %d, maxFitness: %d->%d/%d, iter: %d, popul: %d, attempt: %d", tmpFitness, origFitness, maxScoreData.getFitness(), maxFitness, currentGeneration, newPopulation.size(), attempt);
             }
+            attempt = 0;
             updateMaxScore(newPopulation);
+            System.out.printf("\rcurrentFitness: %d, maxFitness: %d->%d/%d, iter: %d", tmpFitness, origFitness, maxScoreData.getFitness(), maxFitness, ++currentGeneration);
 
             population = new ArrayList<>(newPopulation);
-            System.out.printf("\rcurrentFitness: %d, maxFitness: %d->%d/%d, iter: %d",  tmpFitness, origFitness, maxScoreData.getFitness(), maxFitness, ++currentGeneration);
 
         }
 
@@ -83,6 +89,7 @@ public class TransportOptimizer {
 
     public void updateMaxScore(ArrayList<DataStructure> dataStructure) {
         for (DataStructure data : dataStructure) {
+            data.reevaData();
             if (data.getFitness() > maxScoreData.getFitness()) {
                 maxScoreData = new DataStructure(data);
             }
@@ -90,7 +97,7 @@ public class TransportOptimizer {
 
     }
 
-    private int initMaxFitness(ArrayList<StationData> data){
+    private int initMaxFitness(ArrayList<StationData> data) {
         int genSize = 0;
         for (int i = 0; i < data.size(); i++) {
             genSize += data.get(i).getRouteTime().size();
@@ -113,7 +120,6 @@ public class TransportOptimizer {
 
     private int countConflicts(ArrayList<StationData> stationDataList) {
         int conflicts = 0;
-        Random rand = new Random();
         Map<String, Map<String, ArrayList<Date>>> times = new HashMap<>();
 
         // Collect times for each station and working days
@@ -121,6 +127,15 @@ public class TransportOptimizer {
             times.computeIfAbsent(data.getStationName(), k -> new HashMap<>())
                     .computeIfAbsent(data.getRouteWorkingDays(), k -> new ArrayList<>())
                     .addAll(data.getRouteTime());
+        }
+
+        Map<String, Set<String>> routesForStations = new HashMap<>();
+
+        // Збираємо маршрути для кожної станції
+        for (StationData data : stationDataList) {
+            // Переконуємося, що в мапі є запис для назви станції
+            routesForStations.computeIfAbsent(data.getStationName(), k -> new HashSet<>())
+                    .add(data.getRouteGeneralInfo());
         }
 
         // Sort and print times for each station and working days
@@ -128,69 +143,33 @@ public class TransportOptimizer {
             String stationName = stationEntry.getKey();
             //System.out.println("Station: " + stationName);
 
-            for (Map.Entry<String, ArrayList<Date>> daysEntry : stationEntry.getValue().entrySet()) {
-                ArrayList<Date> timeList = daysEntry.getValue();
-                Collections.sort(timeList);
+                for (Map.Entry<String, ArrayList<Date>> daysEntry : stationEntry.getValue().entrySet()) {
+                    ArrayList<Date> timeList = daysEntry.getValue();
+                    Collections.sort(timeList);
 
-                ArrayList<Date> filteredTimes = new ArrayList<>();
+                    ArrayList<Date> filteredTimes = new ArrayList<>();
 
-                for (int i = 0; i < timeList.size(); i++) {
-                    Date currentTime = timeList.get(i);
-                    if (i + 1 < timeList.size()) {
-                        Date nextTime = timeList.get(i + 1);
-                        long interval = (nextTime.getTime() - currentTime.getTime()) / (60 * 1000); // Interval in minutes
-                        if (interval < 1) {
-                            if (!filteredTimes.contains(currentTime)) {
-                                filteredTimes.add(currentTime);
+                    for (int i = 0; i < timeList.size(); i++) {
+                        Date currentTime = timeList.get(i);
+                        if (i + 1 < timeList.size()) {
+                            Date nextTime = timeList.get(i + 1);
+                            long interval = (nextTime.getTime() - currentTime.getTime()) / (60 * 1000); // Interval in minutes
+                            if (interval < 1) {
+                                if (!filteredTimes.contains(currentTime)) {
+                                    filteredTimes.add(currentTime);
+                                }
+                                filteredTimes.add(nextTime);
                             }
-                            filteredTimes.add(nextTime);
-
                         }
                     }
+                    conflicts += filteredTimes.size();
                 }
 
-                conflicts += filteredTimes.size();
-            }
         }
         return conflicts;
     }
 
-    private void coregData(ArrayList<StationData> stationDataList) {
-        Random rand = new Random();
-        Map<String, Map<String, ArrayList<Date>>> times = new HashMap<>();
-
-        // Collect times for each station and working days
-        for (StationData data : stationDataList) {
-            times.computeIfAbsent(data.getStationName(), k -> new HashMap<>())
-                    .computeIfAbsent(data.getRouteWorkingDays(), k -> new ArrayList<>())
-                    .addAll(data.getRouteTime());
-        }
-
-        // Sort and print times for each station and working days
-        for (Map.Entry<String, Map<String, ArrayList<Date>>> stationEntry : times.entrySet()) {
-                        for (Map.Entry<String, ArrayList<Date>> daysEntry : stationEntry.getValue().entrySet()) {
-                ArrayList<Date> timeList = daysEntry.getValue();
-                Collections.sort(timeList);
-
-                for (int i = 0; i < timeList.size(); i++) {
-                    Date currentTime = timeList.get(i);
-                    if (i + 1 < timeList.size()) {
-                        Date nextTime = timeList.get(i + 1);
-                        long interval = (nextTime.getTime() - currentTime.getTime()) / (60 * 1000); // Interval in minutes
-                        if (interval < 1) {
-                            if(rand.nextInt(3000) == 5){
-                                nextTime.setTime(nextTime.getTime() + 2 * 60 * 1000);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-    }
-
     private int countMiniConflicts(ArrayList<Date> times) {
-
         int conflicts = 0;
 
         for (int i = 0; i < times.size(); i++) {
@@ -221,7 +200,7 @@ public class TransportOptimizer {
             ArrayList<Date> newDates = new ArrayList<>(tmpStationData.getRouteTime().size());
             for (int j = 0; j < tmpStationData.getRouteTime().size(); j++) {
                 Date tmpRouteTime = tmpStationData.getRouteTime().get(j);
-                if (rand.nextBoolean() && parent1.getData().get(i).getMiniFitness() < parent2.getData().get(i).getMiniFitness()) {
+                if (rand.nextBoolean()) {
                     newDates.add(tmpRouteTime);
                 } else {
                     newDates.add(parent1.getData().get(i).getRouteTime().get(j));
@@ -229,58 +208,46 @@ public class TransportOptimizer {
             }
             newRouteData.add(new StationData(tmpStationData.getStationName(), tmpStationData.getRouteGeneralInfo(), newDates));
         }
-        coregData(newRouteData);
+        //coregData(newRouteData);
+        //mutate(newRouteData);
         return new DataStructure(newRouteData);
     }
 
     private void mutate(DataStructure dataStructure) {
-        ArrayList<StationData> stationData = dataStructure.getData();
+        ArrayList<StationData> stationDataList = dataStructure.getData();
         Random rand = new Random();
+        Map<String, Map<String, ArrayList<Date>>> times = new HashMap<>();
 
-        for (StationData schedule : stationData) {
-            int index = rand.nextInt(schedule.getRouteTime().size());
-            Date originalTime = schedule.getRouteTime().get(index);
-            Date newTime = new Date(originalTime.getTime() + (rand.nextBoolean() ? 60 * 1000 : -60 * 1000));
+        // Collect times for each station and working days
+        for (StationData data : stationDataList) {
+            times.computeIfAbsent(data.getStationName(), k -> new HashMap<>())
+                    .computeIfAbsent(data.getRouteWorkingDays(), k -> new ArrayList<>())
+                    .addAll(data.getRouteTime());
+        }
 
-            int conflictCount = 0;
-            boolean conflict;
+        // Sort and print times for each station and working days
+        for (Map.Entry<String, Map<String, ArrayList<Date>>> stationEntry : times.entrySet()) {
+            for (Map.Entry<String, ArrayList<Date>> daysEntry : stationEntry.getValue().entrySet()) {
+                ArrayList<Date> timeList = daysEntry.getValue();
+                Collections.sort(timeList);
 
-            do {
-                conflict = false;
-                for (Date time : schedule.getRouteTime()) {
-                    if (time != originalTime && Math.abs(newTime.getTime() - time.getTime()) < 60 * 1000) {
-                        newTime = new Date(newTime.getTime() + (rand.nextBoolean() ? 60 * 1000 : -60 * 1000));
-                        conflict = true;
-                        conflictCount++;
-                        break;
+                for (int i = 0; i < timeList.size(); i++) {
+                    Date currentTime = timeList.get(i);
+                    if (i + 1 < timeList.size()) {
+                        Date nextTime = timeList.get(i + 1);
+                        long interval = (nextTime.getTime() - currentTime.getTime()) / (60 * 1000); // Interval in minutes
+                        if (interval < 1) {
+                            if (rand.nextBoolean()) {
+                                nextTime.setTime(nextTime.getTime() + (rand.nextInt(MAX_INCREMENT_MINUTES-1)+1) * 60 * 1000);
+                            } else {
+                                currentTime.setTime(currentTime.getTime() - (rand.nextInt(MAX_DECREMENT_MINUTES-1)+1) * 60 * 1000);
+                            }
+                        }
                     }
                 }
-
-//                if (conflictCount >= 50) {
-//                    shiftRandomElements(schedule.getRouteTime(), index);
-//                    conflict = false; // Exit loop after shifting times
-//                }
-            } while (conflict);
-
-            schedule.getRouteTime().set(index, newTime);
+            }
         }
-    }
 
-    /**
-     * Shifts a random number of elements in the list, starting from the specified index, by ±1 minute.
-     *
-     * @param times  The list of times to shift.
-     * @param startIndex The starting index for shifting.
-     */
-    private void shiftRandomElements(ArrayList<Date> times, int startIndex) {
-        Random rand = new Random();
-        int numberOfElementsToShift = 2 + rand.nextInt(times.size() - startIndex - 1); // Random number between 2 and the end of the list
-        long offset = (rand.nextBoolean() ? 60 * 1000 : -60 * 1000); // ±1 minute
-
-        for (int i = startIndex; i < startIndex + numberOfElementsToShift && i < times.size(); i++) {
-            Date shiftedTime = new Date(times.get(i).getTime() + offset);
-            times.set(i, shiftedTime);
-        }
     }
 
     @Getter
@@ -290,16 +257,31 @@ public class TransportOptimizer {
         private ArrayList<StationData> data;
 
         public DataStructure(ArrayList<StationData> data) {
-            this.data = data;
-            this.fitness = evaluateFitness(data);
+            this.data = deepCopy(data);
+            this.fitness = evaluateFitness(this.data);
         }
 
         public DataStructure(DataStructure clone) {
-            this.data = new ArrayList<>(clone.data);
+            this.data = deepCopy(clone.getData());
             this.fitness = clone.getFitness();
         }
-    }
 
+        public void reevaData() {
+            this.fitness = evaluateFitness(data);
+        }
+
+        private ArrayList<StationData> deepCopy(ArrayList<StationData> original) {
+            ArrayList<StationData> copy = new ArrayList<>();
+            for (StationData stationData : original) {
+                ArrayList<Date> newRouteTimes = new ArrayList<>();
+                for (Date date : stationData.getRouteTime()) {
+                    newRouteTimes.add(new Date(date.getTime()));
+                }
+                copy.add(new StationData(stationData.getStationName(), stationData.getRouteGeneralInfo(), newRouteTimes));
+            }
+            return copy;
+        }
+    }
 
 }
 

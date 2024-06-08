@@ -17,8 +17,8 @@ public class Main {
     public static void main(String[] args)  {
         ArrayList<StationData> stationDataList = initializeStationData();
 
-        createExcelFile(stationDataList, "orig");
-        printSortedTimes(stationDataList);
+        //createExcelFile(stationDataList, "orig");
+        //printSortedTimes(stationDataList);
 
         System.out.println("\nwas orig");
         TransportOptimizer ga = new TransportOptimizer(stationDataList);
@@ -27,7 +27,7 @@ public class Main {
         System.out.println("\n\n\n");
 
         createExcelFile(optimizedSchedule, "opt");
-        printSortedTimes(optimizedSchedule);
+        //printSortedTimes(optimizedSchedule);
         System.out.println("\nwas new");
 
 
