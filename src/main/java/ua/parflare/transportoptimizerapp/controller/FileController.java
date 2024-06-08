@@ -32,7 +32,7 @@ public class FileController {
     }
 
     @PostMapping("/optimize")
-    public ResponseEntity<String>  optimizeFile(@RequestParam("userName") String userName) {
+    public ResponseEntity<String> optimizeFile(@RequestParam("userName") String userName) {
         try {
             String result = fileService.optimize(userName);
             return ResponseEntity.ok(result);

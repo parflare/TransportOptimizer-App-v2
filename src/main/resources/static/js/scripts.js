@@ -182,11 +182,11 @@ function downloadFile() {
     xhr.open('GET', `/download?userName=${username}`, true);
     xhr.responseType = 'blob';
 
-    xhr.onload = function(e) {
+    xhr.onload = function (e) {
         loader.style.display = 'none';
         if (this.status === 200) {
             console.log('Response received successfully.');
-            var blob = new Blob([this.response], { type: 'application/zip' });
+            var blob = new Blob([this.response], {type: 'application/zip'});
             var url = window.URL.createObjectURL(blob);
             var a = document.createElement('a');
             a.href = url;
@@ -199,7 +199,7 @@ function downloadFile() {
         }
     };
 
-    xhr.onerror = function() {
+    xhr.onerror = function () {
         loader.style.display = 'none';
         console.error('Network error occurred.');
     };

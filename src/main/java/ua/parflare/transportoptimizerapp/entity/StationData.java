@@ -32,7 +32,7 @@ public class StationData {
         if (stationName.startsWith(" ")) {
             stationName = stationName.replaceFirst("^\\s+", "");
         }
-        if (stationName.contains("\"")){
+        if (stationName.contains("\"")) {
             int firstQuoteIndex = stationName.indexOf("\"");
             // Находим индекс второго вхождения двойных кавычек
             int secondQuoteIndex = stationName.indexOf("\"", firstQuoteIndex + 1);
@@ -46,8 +46,6 @@ public class StationData {
         }
 
 
-
-
         this.stationName = stationName;
         this.routeGeneralInfo = routeGeneralInfo;
         this.routeTime = routeTime;
@@ -56,14 +54,12 @@ public class StationData {
     }
 
 
-
-
     public void combineRouteTime(ArrayList<Date> routeTime) {
         this.routeTime.addAll(routeTime);
         Collections.sort(this.routeTime);
     }
 
-    private void extractGeneralInfo(String info){
+    private void extractGeneralInfo(String info) {
         this.routeNumber = getRouteNumber(info);
         this.routeName = getRouteName(info);
         this.routeWorkingDays = getRouteWorkingDays(info);
@@ -98,7 +94,7 @@ public class StationData {
         while (matcher.find()) {
             lastMatch = matcher.group(1);
         }
-        if(lastMatch == null || lastMatch.contains("щоденно") ){
+        if (lastMatch == null || lastMatch.contains("щоденно")) {
             return "щоденно";
         }
         return lastMatch;
@@ -110,7 +106,7 @@ public class StationData {
         sb.append("stationName='").append(stationName).append('\'');
         sb.append(", routeInfo='").append(routeGeneralInfo).append('\'');
         sb.append(", routeTime=[");
-        routeTime.forEach( date -> sb.append(new SimpleDateFormat("HH:mm").format((date))).append(", "));
+        routeTime.forEach(date -> sb.append(new SimpleDateFormat("HH:mm").format((date))).append(", "));
         sb.delete(sb.length() - 2, sb.length());
         sb.append("]}");
         return sb.toString();
