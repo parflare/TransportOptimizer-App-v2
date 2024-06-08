@@ -96,15 +96,20 @@ $(document).ready(function () {
                 if (response.ok) {
                     response.text().then(result => {
                         console.log(result);
+                        console.info(result);
                         changeClasses(iconElement, 'fa-solid', 'fa-cloud-download');
                         dragText.textContent = result;
                         dragSpan.textContent = 'but you can change file';
 
                         document.getElementById('processFileButton').classList.remove('disabled');
+                        document.getElementById('optimizeFileButton').classList.remove('disabled');
+
                     })
                 } else {
                     response.text().then(errorMessage => {
                         document.getElementById('processFileButton').classList.add('disabled');
+                        document.getElementById('optimizeFileButton').classList.remove('disabled');
+
                         throw new Error(errorMessage);
                     })
                         .catch(error => {
@@ -123,36 +128,65 @@ $(document).ready(function () {
 
 });
 
-
-// Функція для запуску обробки файлу на сервері
-async function processFile() {
-    const response = await fetch(`/process?userName=${username}`, {
-        method: 'POST'
-    });
-
-    if (response.ok) {
-        response.text().then(result => {
-            console.log(result);
+async function optimizeFile() {
+    const loader = document.getElementById('optimizeLoader');
+    loader.style.display = 'inline-block';
+    try {
+        const response = await fetch(`/optimize?userName=${username}`, {
+            method: 'POST'
         });
-        // Показуємо кнопку "Download zip"
-        document.getElementById('downloadZipButton').classList.remove('disabled');
-    } else {
-        document.getElementById('downloadZipButton').classList.add('disabled');
-        console.error('Помилка при обробці файлу');
+
+        if (response.ok) {
+            const result = await response.text();
+            console.log(result);
+            console.info(result);
+        } else {
+            console.error('Помилка при оптимізації файлу');
+        }
+    } catch (error) {
+        console.error('Помилка при оптимізації файлу', error);
+    } finally {
+        loader.style.display = 'none';
     }
 }
 
+async function processFile() {
+    const loader = document.getElementById('processLoader');
+    loader.style.display = 'inline-block';
+    try {
+        const response = await fetch(`/process?userName=${username}`, {
+            method: 'POST'
+        });
+
+        if (response.ok) {
+            const result = await response.text();
+            console.log(result);
+            console.info(result);
+            // Показуємо кнопку "Download zip"
+            document.getElementById('downloadZipButton').classList.remove('disabled');
+        } else {
+            document.getElementById('downloadZipButton').classList.add('disabled');
+            console.error('Помилка при обробці файлу');
+        }
+    } catch (error) {
+        console.error('Помилка при обробці файлу', error);
+    } finally {
+        loader.style.display = 'none';
+    }
+}
 
 function downloadFile() {
+    const loader = document.getElementById('downloadLoader');
+    loader.style.display = 'inline-block';
     var xhr = new XMLHttpRequest();
     xhr.open('GET', `/download?userName=${username}`, true);
     xhr.responseType = 'blob';
 
-    xhr.onload = function(e) {
-
+    xhr.onload = function (e) {
+        loader.style.display = 'none';
         if (this.status === 200) {
             console.log('Response received successfully.');
-            var blob = new Blob([this.response], { type: 'application/zip' });
+            var blob = new Blob([this.response], {type: 'application/zip'});
             var url = window.URL.createObjectURL(blob);
             var a = document.createElement('a');
             a.href = url;
@@ -165,10 +199,10 @@ function downloadFile() {
         }
     };
 
-    xhr.onerror = function() {
+    xhr.onerror = function () {
+        loader.style.display = 'none';
         console.error('Network error occurred.');
     };
 
     xhr.send();
-
 }
