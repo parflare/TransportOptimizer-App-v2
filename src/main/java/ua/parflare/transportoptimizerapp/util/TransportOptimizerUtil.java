@@ -88,9 +88,7 @@ public class TransportOptimizerUtil {
             System.out.printf("\rcurrentFitness: %d, maxFitness: %d->%d/%d, iter: %d", tmpFitness, origFitness, maxScoreData.getFitness(), maxFitness, ++currentGeneration);
 
             population = new ArrayList<>(newPopulation);
-
         }
-
         System.out.println();
 
         return maxScoreData.getData();
