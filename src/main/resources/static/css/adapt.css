@@ -1,4 +1,3 @@
-
 @media (min-width: 801px) {
     #logo {
         float: left;
@@ -26,6 +25,7 @@
         font-size: 1.5em;
     }
 }
+
 @media (min-width: 1001px) {
     #top {
         font-size: 3em;
