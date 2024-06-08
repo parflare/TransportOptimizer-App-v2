@@ -35,3 +35,4 @@ build/
 ### Custom ###
 /src/test
 /logs/
+/files/
