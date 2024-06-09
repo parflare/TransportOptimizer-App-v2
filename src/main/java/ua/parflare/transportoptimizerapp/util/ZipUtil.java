@@ -29,7 +29,6 @@ public class ZipUtil {
                         zos.write(buffer, 0, len);
                     }
                 }
-                zos.closeEntry();
 
                 // Виводимо прогрес у консоль
                 System.out.printf("\rProcessed [%d/%d] files",
