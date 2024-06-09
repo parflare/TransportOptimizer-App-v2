@@ -36,3 +36,4 @@ build/
 /src/test
 /logs/
 /files/
+/src/main/resources/secrets.env
